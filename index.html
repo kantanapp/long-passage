@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英検 長文問題アプリ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .passage-text { line-height: 2; letter-spacing: 0.01em; }
+    .opt-btn { transition: all 0.15s ease; }
+    .opt-btn:hover:not(.answered) { transform: translateX(4px); }
+    .fade-in { animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .card-hover { transition: all 0.18s ease; }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .progress-bar { transition: width 0.6s ease; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+<div id="app"></div>
+
+<script>
+// ============================================================
+// SAMPLE DATA — 英検スタイルのオリジナルサンプル問題
+// ============================================================
+const SAMPLE_PROBLEMS = [
+  {
+    id: 's-2-2024-1',
+    level: 2, year: 2024, season: '第1回', number: '長文問題 A',
+    passageTitle: 'The Rise of Urban Farming',
+    passage: `Cities around the world are increasingly embracing urban farming as a solution to food security challenges. From rooftop gardens in New York to vertical farms in Singapore, these innovative approaches to agriculture are transforming how urban residents think about food production.
+
+Urban farming encompasses a wide range of activities, from small community gardens to large-scale indoor vertical farms. These operations can produce a variety of crops, including vegetables, herbs, and even fish through aquaponics systems. In many cities, unused spaces such as abandoned lots, parking structures, and building rooftops have been converted into productive growing areas.
+
+The benefits of urban farming extend beyond simply providing fresh produce. Studies have shown that community gardens improve mental health by offering residents a connection to nature and opportunities for social interaction. In densely populated cities, these green spaces also help reduce the urban heat island effect, where cities tend to be significantly warmer than surrounding rural areas due to the abundance of heat-absorbing surfaces like concrete and asphalt.
+
+However, urban farming faces significant challenges. The cost of urban land makes large-scale operations economically difficult, and soil contamination in some urban areas can make traditional ground-level farming unsafe without extensive testing and remediation. Water usage is another concern, as conventional farming methods can be inefficient in resource-limited urban environments.
+
+Despite these obstacles, technological advances are helping urban farmers overcome many limitations. LED lighting systems allow crops to be grown in enclosed spaces without natural sunlight, while hydroponic and aeroponic systems reduce water usage by up to 90% compared to conventional soil-based farming. These innovations are making urban farming increasingly viable as both a commercial enterprise and a community resource.`,
+    questions: [
+      { id:0, text:'According to the passage, which of the following is one benefit of urban farming?',
+        options:['It eliminates the need for rural agriculture entirely.','It helps reduce temperature differences between cities and surrounding areas.','It provides cheaper produce than conventional farming.','It eliminates soil contamination problems in cities.'],
+        correctAnswer:1, explanation:'第3段落に "these green spaces also help reduce the urban heat island effect, where cities tend to be significantly warmer than surrounding rural areas" とあります。都市農園の緑地がヒートアイランド現象（都市と周辺農村の気温差）を緩和する効果があると述べられています。正解は (2) です。' },
+      { id:1, text:'What is mentioned as a challenge for urban farming?',
+        options:['The difficulty of growing herbs and vegetables indoors.','The lack of interest from city residents.','High land costs making large-scale operations financially difficult.','The absence of technology for growing crops without sunlight.'],
+        correctAnswer:2, explanation:'第4段落に "The cost of urban land makes large-scale operations economically difficult" とあります。都市部の地価が高く大規模農業を困難にしていることが課題として挙げられています。正解は (3) です。' },
+      { id:2, text:'According to the passage, how do hydroponic and aeroponic systems help urban farming?',
+        options:['They eliminate the need for LED lighting.','They allow crops to grow without any water.','They significantly reduce water consumption.','They make urban farming as productive as rural farming.'],
+        correctAnswer:2, explanation:'最終段落に "hydroponic and aeroponic systems reduce water usage by up to 90% compared to conventional soil-based farming" とあります。水耕・エアロポニック栽培が従来農法比で最大90%の節水を実現することが述べられています。正解は (3) です。' }
+    ]
+  },
+  {
+    id: 's-2-2023-2',
+    level: 2, year: 2023, season: '第2回', number: '長文問題 B',
+    passageTitle: 'The Science of Sleep',
+    passage: `Sleep is one of the most fundamental biological processes, yet its exact purpose remained a mystery to scientists for many years. Recent advances in neuroscience have shed new light on why humans and most animals spend roughly one-third of their lives in this state of reduced consciousness.
+
+For decades, researchers believed that sleep primarily served as a period of rest and recovery for the body. While this is partially true—muscles repair themselves and the immune system strengthens during sleep—scientists have discovered that the brain undergoes equally important processes during this time. One of the most significant discoveries concerns the glymphatic system, a network of channels in the brain that becomes particularly active during sleep.
+
+The glymphatic system functions as the brain's waste-clearance mechanism. During sleep, cerebrospinal fluid flows through these channels, flushing out toxic proteins and cellular waste products that accumulate during waking hours. Among the substances removed is beta-amyloid, a protein associated with Alzheimer's disease. This finding has led researchers to hypothesize that chronic sleep deprivation may contribute to the development of neurodegenerative diseases by preventing adequate clearance of these harmful substances.
+
+Sleep is also essential for memory consolidation. During the rapid eye movement (REM) stage, the brain processes and organizes experiences from the day, transferring information from short-term to long-term memory storage. Studies with both humans and animals have demonstrated that sleep deprivation significantly impairs the ability to learn and retain new information.
+
+The implications of these findings extend to public health policy. In many modern societies, chronic sleep deprivation has become increasingly common due to demanding work schedules, increased screen time, and other lifestyle factors. Health authorities have begun to emphasize that adequate sleep—typically seven to nine hours for adults—should be considered as important as proper nutrition and regular exercise for maintaining overall health.`,
+    questions: [
+      { id:0, text:'What function does the glymphatic system serve according to the passage?',
+        options:['It strengthens the immune system during sleep.','It transfers memories from short-term to long-term storage.','It removes waste products and toxic proteins from the brain.','It regulates the production of cerebrospinal fluid.'],
+        correctAnswer:2, explanation:'第3段落に "cerebrospinal fluid flows through these channels, flushing out toxic proteins and cellular waste products" とあります。グリンパティック系は脳の老廃物・有害タンパク質の洗浄機構として機能します。正解は (3) です。' },
+      { id:1, text:'According to the passage, what did researchers hypothesize about chronic sleep deprivation?',
+        options:['It directly causes the production of beta-amyloid.','It may increase the risk of neurodegenerative diseases.','It permanently damages the glymphatic system.','It reduces immune system effectiveness over time.'],
+        correctAnswer:1, explanation:'第3段落に "chronic sleep deprivation may contribute to the development of neurodegenerative diseases by preventing adequate clearance of these harmful substances" とあります。慢性的な睡眠不足が神経変性疾患の発症に関与する可能性があると述べられています。正解は (2) です。' },
+      { id:2, text:'What role does REM sleep play according to the passage?',
+        options:["It activates the brain's waste-clearance mechanism.",'It helps the body\'s muscles repair themselves.','It enables the brain to consolidate and organize memories.','It reduces the production of harmful proteins in the brain.'],
+        correctAnswer:2, explanation:'第4段落に "During the rapid eye movement (REM) stage, the brain processes and organizes experiences from the day, transferring information from short-term to long-term memory storage" とあります。レム睡眠中に一日の経験が処理・整理され長期記憶へ転送されます。正解は (3) です。' }
+    ]
+  },
+  {
+    id: 's-1-2024-1',
+    level: 1, year: 2024, season: '第1回', number: '長文問題 A',
+    passageTitle: 'The Malleability of Human Memory',
+    passage: `For much of the twentieth century, scientists and legal professionals alike operated under the assumption that human memory functions like a video recorder, faithfully capturing and storing experiences for later playback. This view has been fundamentally challenged by decades of research in cognitive psychology, which has demonstrated that memory is far more reconstructive than reproductive in nature.
+
+The pioneering work of cognitive psychologist Elizabeth Loftus has been particularly influential in reshaping our understanding of memory. Through a series of landmark experiments conducted in the 1970s, Loftus demonstrated that eyewitness memories could be altered through the introduction of misleading post-event information. In one famous study, participants who witnessed a simulated car accident were asked leading questions implying either a stop sign or a yield sign was present. When later asked to recall what they had seen, many participants reported seeing the sign suggested in the question, even when it contradicted what they had actually witnessed.
+
+This phenomenon, known as the misinformation effect, has profound implications for the legal system. Research suggests that eyewitness testimony, long considered highly reliable, can be significantly distorted by factors ranging from the wording of police interview questions to media coverage of a crime. Studies have found that a substantial proportion of wrongful convictions in the United States involved eyewitness misidentification, highlighting the potentially devastating consequences of memory's malleability.
+
+Memory researchers have also identified source monitoring errors as a contributing factor in false memory formation. When people reconstruct memories, they sometimes confuse the source of information, misattributing imagined events to actual experiences or conflating details from different episodes into a single narrative. This tendency becomes more pronounced when the original memory trace is weak or when considerable time has elapsed since the original event.
+
+The neural basis of memory malleability has become clearer through advances in neuroimaging technology. Research has shown that the act of remembering itself can alter memories, as the neural networks activated during recall are susceptible to modification. This reconsolidation process means that every time a memory is retrieved, it becomes temporarily vulnerable to change before being re-stored in a potentially altered form.
+
+These findings have practical implications beyond the courtroom. Educational researchers have explored how understanding memory's reconstructive nature might improve teaching methods, while therapists grapple with the ethical implications of recovered memories in clinical settings. The malleability of memory, once seen merely as a limitation, is now understood to reflect a fundamental aspect of how the brain adaptively processes and integrates information across time.`,
+    questions: [
+      { id:0, text:'What does the author suggest was the traditional scientific view of human memory?',
+        options:['Memory works selectively, recording only emotionally significant events.','Memory operates like a recording device that preserves experiences accurately.','Memory is an inherently creative process that generates novel information.','Memory stores information in fragments that must be reconstructed consciously.'],
+        correctAnswer:1, explanation:'第1段落に "human memory functions like a video recorder, faithfully capturing and storing experiences for later playback" とあります。従来の見解では記憶はビデオレコーダーのように経験を忠実に記録・保存するものと考えられていました。正解は (2) です。' },
+      { id:1, text:"According to the passage, what did Loftus's experiments primarily demonstrate?",
+        options:['Eyewitnesses of car accidents have particularly unreliable memories.','Post-event information can alter the content of eyewitness memories.','Leading questions cause witnesses to invent entirely new memories.','Memory reliability is determined primarily by emotional impact.'],
+        correctAnswer:1, explanation:'第2段落に "eyewitness memories could be altered through the introduction of misleading post-event information" とあります。ロフタスの実験は事後に与えられた誤情報によって目撃者の記憶が変化しうることを実証しました。正解は (2) です。' },
+      { id:2, text:'What is described as a source monitoring error in the passage?',
+        options:['Misremembering the sequence in which events occurred.','Being unable to recall specific details of a past experience.','Confusing where a memory originated with another source.','Forgetting memories formed under emotional stress.'],
+        correctAnswer:2, explanation:'第4段落に "they sometimes confuse the source of information, misattributing imagined events to actual experiences" とあります。ソースモニタリングエラーとは記憶の出所を混同し、想像上の出来事を実際の経験と誤って紐づけることです。正解は (3) です。' },
+      { id:3, text:"According to the passage, what happens during the reconsolidation process?",
+        options:['Memories become increasingly resistant to modification with each retrieval.','Neural networks are permanently stabilized when memories are recalled.','Retrieved memories may undergo alteration before being stored again.','The brain automatically distinguishes real memories from imagined ones.'],
+        correctAnswer:2, explanation:'第5段落に "every time a memory is retrieved, it becomes temporarily vulnerable to change before being re-stored in a potentially altered form" とあります。再固定化プロセスでは記憶が想起されるたびに一時的に変化しやすくなり、変化した形で再保存される可能性があります。正解は (3) です。' }
+    ]
+  },
+  {
+    id: 's-1-2023-2',
+    level: 1, year: 2023, season: '第2回', number: '長文問題 B',
+    passageTitle: 'The Economics of Artificial Intelligence',
+    passage: `The rapid proliferation of artificial intelligence technologies has sparked intense debate among economists about the long-term implications for labor markets and economic inequality. While technological optimists point to historical precedents suggesting that automation ultimately creates more jobs than it destroys, a growing body of research indicates that AI may represent a fundamentally different kind of technological transition.
+
+Previous waves of automation, from the Industrial Revolution to the computerization of the late twentieth century, primarily displaced workers performing routine physical or cognitive tasks. These workers were often able to transition to new occupations requiring different skills, and the productivity gains generated by automation contributed to broader economic growth. Economists who subscribe to this view argue that fears of technological unemployment are historically unfounded.
+
+However, critics contend that AI systems are qualitatively different from earlier technologies because of their capacity for generalization. Unlike previous automation tools designed for specific, well-defined tasks, advanced AI systems can perform an increasingly broad range of cognitive functions. Natural language processing models can now write legal documents, perform medical diagnoses, and generate software code—tasks previously thought to require uniquely human judgment and expertise. This breadth raises the possibility that AI may simultaneously displace workers across multiple sectors rather than sequentially displacing specific occupation categories.
+
+The distributional effects of AI adoption are also a subject of considerable concern. Research has found that while AI tends to increase overall productivity and aggregate economic output, the gains are disproportionately captured by capital owners and highly skilled workers who can leverage AI as a complement to their own capabilities. Workers in lower-skill occupations, particularly those in service industries and administrative roles, face greater displacement risk with fewer pathways to transition into new, well-compensated positions.
+
+Policymakers are increasingly grappling with how to respond to these challenges. Proposals range from targeted retraining programs and expanded education initiatives to more radical interventions such as universal basic income schemes or taxes on automation. The effectiveness of these approaches remains contested, with economists divided on both the severity of AI-driven labor market disruption and the appropriate policy responses. What appears clear is that the trajectory of AI development will have profound consequences for the structure of work and the distribution of economic prosperity in the coming decades.`,
+    questions: [
+      { id:0, text:'According to the passage, what distinguishes AI from earlier automation technologies?',
+        options:['AI was specifically designed to replace physical labor in industrial settings.','AI systems are capable of performing a wide variety of cognitive functions.','AI is the first technology to have eliminated entire occupation categories.','AI generates greater productivity gains than any previous technology.'],
+        correctAnswer:1, explanation:'第3段落に "AI systems are qualitatively different from earlier technologies because of their capacity for generalization" "advanced AI systems can perform an increasingly broad range of cognitive functions" とあります。AIの際立った特徴はその汎用性にあります。正解は (2) です。' },
+      { id:1, text:'What does the passage suggest about the economic benefits of AI adoption?',
+        options:['The gains from AI are distributed equally across all income groups.','AI benefits are primarily realized in manufacturing and industrial sectors.','The advantages of AI adoption tend to favor capital owners and highly skilled workers.','AI increases economic output while simultaneously reducing income inequality.'],
+        correctAnswer:2, explanation:'第4段落に "the gains are disproportionately captured by capital owners and highly skilled workers who can leverage AI as a complement to their own capabilities" とあります。AIによる経済的利益は資本所有者と高スキル労働者に不均衡に集中します。正解は (3) です。' },
+      { id:2, text:"Which of the following best describes the passage's portrayal of AI's impact on lower-skill workers?",
+        options:["Lower-skill workers benefit from AI through improved working conditions.","Lower-skill workers face higher displacement risk with limited pathways to better jobs.","Lower-skill workers are largely unaffected by AI due to the manual nature of their work.","Lower-skill workers are being retrained effectively by government programs."],
+        correctAnswer:1, explanation:'第4段落に "Workers in lower-skill occupations... face greater displacement risk with fewer pathways to transition into new, well-compensated positions" とあります。低スキル労働者は高い雇用喪失リスクに直面し、より良い職への移行経路も少ないと述べられています。正解は (2) です。' },
+      { id:3, text:"According to the passage, what remains uncertain regarding AI's impact on labor markets?",
+        options:["Whether AI will affect both physical and cognitive occupations simultaneously","The extent of disruption and the best policy responses to address it","Whether capital owners will benefit more from AI than other economic groups","The ability of AI to perform tasks previously requiring specialized human expertise"],
+        correctAnswer:1, explanation:'最終段落に "economists divided on both the severity of AI-driven labor market disruption and the appropriate policy responses" とあります。AIが引き起こす労働市場混乱の深刻さと適切な政策対応の両方について意見が分かれています。正解は (2) です。' }
+    ]
+  },
+  {
+    id: 'n-2-2023-3', level: 2, year: 2023, season: '第3回', number: '長文問題 A',
+    passageTitle: 'Coral Reefs and Climate Change',
+    passage: `Coral reefs are among the most biologically diverse ecosystems on Earth, supporting approximately 25% of all marine species despite covering less than 1% of the ocean floor. However, these remarkable structures are facing unprecedented threats from climate change, placing the millions of species that depend on them in serious danger.
+
+Coral reefs are built by tiny animals called coral polyps, which form symbiotic relationships with microscopic algae known as zooxanthellae. These algae live within the coral's tissues and provide up to 90% of the coral's energy needs through photosynthesis. When ocean temperatures rise even slightly above normal levels, this relationship breaks down. The coral expels the algae from its tissues, causing it to turn white — a phenomenon called coral bleaching.
+
+While bleaching does not immediately kill coral, it severely weakens the organisms and makes them vulnerable to disease. If water temperatures remain elevated for several weeks, large portions of a reef can die. Scientists have documented several mass bleaching events in recent decades, with the most severe occurring in 2016 and 2017. These events damaged significant portions of the Great Barrier Reef, the world's largest coral reef system, which stretches over 2,300 kilometers off the coast of Australia.
+
+Beyond temperature increases, coral reefs also face threats from ocean acidification. As the atmosphere absorbs more carbon dioxide, oceans become more acidic, making it harder for corals to build their calcium carbonate skeletons. This process not only prevents new coral growth but can dissolve existing reef structures.
+
+Conservation efforts are underway to protect and restore coral reefs. Marine biologists are developing heat-resistant coral strains through selective breeding and genetic modification. Some researchers are experimenting with coral gardening — growing coral fragments in nurseries and transplanting them to damaged reefs. While these efforts show promise, experts emphasize that addressing the root causes of climate change remains the most critical step in preserving these essential ecosystems.`,
+    questions: [
+      { id:0, text:'What is the role of zooxanthellae according to the passage?',
+        options:['They provide the calcium carbonate needed for reef construction.','They supply most of the coral\'s energy through photosynthesis.','They protect corals from rising ocean temperatures.','They prevent the spread of coral disease.'],
+        correctAnswer:1, explanation:'第2段落に "These algae... provide up to 90% of the coral\'s energy needs through photosynthesis" とあります。ズーキサンセレ（共生藻）は光合成によってサンゴのエネルギー需要の最大90%を供給します。正解は (2) です。' },
+      { id:1, text:'What happens during coral bleaching?',
+        options:['Coral polyps abandon their reef structures and migrate.','The coral turns white and immediately dies.','The coral expels the algae living in its tissues.','Ocean acidification dissolves the coral\'s structure.'],
+        correctAnswer:2, explanation:'第2段落に "The coral expels the algae from its tissues, causing it to turn white" とあります。白化現象ではサンゴが組織内の藻類を排出することで白くなります。正解は (3) です。' },
+      { id:2, text:'According to the passage, what approach do some researchers use in restoration efforts?',
+        options:['They lower ocean temperatures through artificial cooling systems.','They reduce ocean acidity by adding chemicals to the water.','They grow coral fragments in nurseries and transplant them to reefs.','They prevent bleaching by removing coral polyps during warm periods.'],
+        correctAnswer:2, explanation:'最終段落に "coral gardening — growing coral fragments in nurseries and transplanting them to damaged reefs" とあります。コーラルガーデニングという手法で育てたサンゴの断片を損傷した礁に移植する取り組みが紹介されています。正解は (3) です。' }
+    ]
+  },
+  {
+    id: 'n-2-2022-1', level: 2, year: 2022, season: '第1回', number: '長文問題 B',
+    passageTitle: 'The Benefits of Bilingual Education',
+    passage: `The number of children receiving bilingual education is growing around the world, as families and governments recognize the cognitive and social benefits of learning two languages simultaneously. While some parents worry that learning two languages at once may confuse young children or slow their linguistic development, research increasingly suggests the opposite.
+
+Studies conducted at universities in Canada, the United States, and Europe have consistently found that bilingual children develop stronger executive function skills compared to their monolingual peers. Executive function refers to a set of mental processes that help people control their behavior, including the abilities to focus attention, switch between tasks, and solve problems. Researchers believe that regularly managing two language systems forces the brain to constantly choose which language to use and suppress the other, providing a mental workout that strengthens these cognitive abilities.
+
+Bilingualism also appears to provide long-term brain health benefits. Several studies have suggested that bilingual individuals develop symptoms of Alzheimer's disease and other forms of dementia an average of four to five years later than those who speak only one language. Scientists hypothesize that the mental exercise involved in managing two languages builds what researchers call "cognitive reserve" — a greater degree of resistance to brain deterioration.
+
+In terms of academic outcomes, bilingual education programs vary considerably in their effectiveness depending on their design. Research shows that programs that use both languages as genuine mediums of instruction — rather than simply teaching a second language as a subject — tend to produce the strongest academic results. Students in well-designed bilingual programs often catch up to or exceed the academic performance of students educated entirely in their native language by the time they reach secondary school.
+
+Despite these benefits, bilingual education can present challenges. Teaching in two languages requires specially trained educators and carefully developed materials, which can strain limited educational resources. Additionally, some communities have expressed concerns about the potential impact on minority languages when children learn both the dominant national language and a second foreign language.`,
+    questions: [
+      { id:0, text:'What does research suggest about learning two languages at an early age?',
+        options:['It causes confusion that slows overall language development.','It has negative effects on academic performance in the short term.','It helps children develop stronger executive function skills.','It reduces the ability to focus on complex academic tasks.'],
+        correctAnswer:2, explanation:'第2段落に "bilingual children develop stronger executive function skills compared to their monolingual peers" とあります。二言語習得が注意集中・課題転換・問題解決などの実行機能の発達を促すと研究が示しています。正解は (3) です。' },
+      { id:1, text:'According to the passage, what is "cognitive reserve"?',
+        options:['The ability to switch rapidly between two different languages.','Extra mental capacity that helps the brain resist deterioration.','A specialized region of the brain used only by bilingual individuals.','The vocabulary stored in long-term memory in two languages.'],
+        correctAnswer:1, explanation:'第3段落に "cognitive reserve — a greater degree of resistance to brain deterioration" とあります。認知的予備力とは脳の劣化に対するより高い抵抗力のことを指します。正解は (2) です。' },
+      { id:2, text:'What type of bilingual education program does research suggest is most effective?',
+        options:['Programs that introduce the second language only after mastering the native language.','Programs that use both languages as actual teaching mediums rather than treating one as a subject.','Programs that focus primarily on speaking and listening skills in both languages.','Programs designed specifically for children who already speak a minority language at home.'],
+        correctAnswer:1, explanation:'第4段落に "programs that use both languages as genuine mediums of instruction — rather than simply teaching a second language as a subject — tend to produce the strongest academic results" とあります。両言語を授業の正式な媒体として使用するプログラムが最も効果的とされています。正解は (2) です。' }
+    ]
+  },
+  {
+    id: 'n-2-2022-2', level: 2, year: 2022, season: '第2回', number: '長文問題 A',
+    passageTitle: 'Microplastics in the Environment',
+    passage: `Over the past decade, scientists have become increasingly concerned about the presence of microplastics — tiny plastic particles measuring less than five millimeters — in the world's oceans, freshwater systems, and even the human body. These particles originate from a variety of sources, including the gradual breakdown of larger plastic items, synthetic textile fibers released during washing, and industrial processes.
+
+Marine environments have been particularly affected. Research has found microplastics in ocean water at all depths, from the surface to the deepest trenches. Small marine organisms, including zooplankton and small fish, often mistake these particles for food, ingesting them and accumulating them in their tissues. As larger predators consume smaller organisms, microplastics become concentrated at higher levels of the food chain through a process called bioaccumulation.
+
+The potential health effects of microplastic ingestion in humans are not yet fully understood. Some laboratory studies have found that certain types of plastic particles and the chemical additives they contain can disrupt hormone function in animals. However, determining the direct health impacts on humans is complicated by the difficulty of isolating microplastic exposure from other environmental factors. Researchers agree that more long-term studies are needed.
+
+One of the challenges in addressing microplastic pollution is that once these particles enter the environment, they are extremely difficult to remove. Unlike larger pieces of plastic that can be collected through cleanup efforts, microplastics are too small and numerous to be efficiently extracted from water. Prevention is therefore considered more effective than remediation. Governments and environmental organizations are promoting the reduction of single-use plastics, improvements to wastewater treatment systems, and the development of biodegradable materials as strategies to limit microplastic pollution.`,
+    questions: [
+      { id:0, text:'What process is described as bioaccumulation in the passage?',
+        options:['The gradual breakdown of large plastic items into smaller particles.','The concentration of microplastics as they move up the food chain.','The absorption of microplastics through the surface of the ocean.','The chemical reaction between plastics and salt water.'],
+        correctAnswer:1, explanation:'第2段落に "microplastics become concentrated at higher levels of the food chain through a process called bioaccumulation" とあります。生物濃縮とは、マイクロプラスチックが食物連鎖の上位に移るにつれて濃縮されていく過程を指します。正解は (2) です。' },
+      { id:1, text:'Why are the health effects of microplastics on humans not yet fully understood?',
+        options:['Microplastics are too small to be detected in human body tissues.','Human exposure levels are too low to have measurable effects.','It is difficult to separate microplastic effects from other environmental factors.','No laboratory studies on microplastic effects have yet been conducted.'],
+        correctAnswer:2, explanation:'第3段落に "determining the direct health impacts on humans is complicated by the difficulty of isolating microplastic exposure from other environmental factors" とあります。ヒトへの直接的な健康影響の特定は他の環境要因から切り離すことの難しさによって複雑化しています。正解は (3) です。' },
+      { id:2, text:'According to the passage, why is prevention considered more effective than cleanup for microplastic pollution?',
+        options:['Cleanup operations cause additional damage to marine ecosystems.','Microplastics dissolve in water and cannot be physically collected.','Microplastics are too small and widespread to be efficiently removed from water.','International agreements prevent governments from conducting cleanup operations.'],
+        correctAnswer:2, explanation:'最終段落に "microplastics are too small and numerous to be efficiently extracted from water" とあります。マイクロプラスチックは小さすぎて数が多すぎるため水から効率的に除去できないため、防止が修復より効果的とされています。正解は (3) です。' }
+    ]
+  },
+  {
+    id: 'n-2-2021-1', level: 2, year: 2021, season: '第1回', number: '長文問題 B',
+    passageTitle: 'Drones in Modern Industry',
+    passage: `Unmanned aerial vehicles, commonly known as drones, were originally developed for military purposes but have rapidly found applications across a wide range of civilian industries. From agriculture to healthcare delivery, these remotely operated aircraft are transforming how businesses operate and creating new possibilities that were unimaginable just a decade ago.
+
+In agriculture, drones equipped with cameras and sensors are being used to monitor crop health across large farm areas with far greater efficiency than traditional ground-based methods. By capturing high-resolution images in infrared and other wavelengths, agricultural drones can identify early signs of disease, pest infestations, or water stress in specific sections of a field before these problems become visible to the human eye. This allows farmers to apply treatments precisely where needed rather than across entire fields, reducing the use of pesticides and fertilizers while improving crop yields.
+
+The delivery of medical supplies represents another significant application. In remote or infrastructure-poor regions, delivering essential medicines, blood samples, and vaccines by road can take hours or even days. Drone delivery services have been successfully implemented in countries including Rwanda and Ghana, where they have dramatically reduced the time required to deliver blood products to hospitals in urgent situations.
+
+Beyond agriculture and delivery, drones are increasingly being used in construction and infrastructure inspection. Inspecting tall structures such as bridges, power lines, and wind turbines traditionally required workers to use scaffolding or specialized equipment, which was both costly and dangerous. Drones equipped with high-definition cameras can perform these inspections more quickly, at lower cost, and without exposing workers to risk.
+
+Despite these advantages, widespread drone use raises concerns about privacy, as drones equipped with cameras can easily capture images of private property and individuals. Regulatory bodies in many countries are working to establish frameworks that balance the economic benefits of drone technology with the need to protect civil liberties.`,
+    questions: [
+      { id:0, text:'What advantage do drones provide in agricultural monitoring according to the passage?',
+        options:['They can replace human workers entirely in managing large farm operations.','They detect problems in specific areas of crops before they become visible to humans.','They automatically apply pesticides to crops whenever disease is detected.','They allow farmers to cultivate previously inaccessible land areas.'],
+        correctAnswer:1, explanation:'第2段落に "can identify early signs of disease... in specific sections of a field before these problems become visible to the human eye" とあります。ドローンは作物の問題を人間の目に見える前に特定エリアで早期発見できます。正解は (2) です。' },
+      { id:1, text:'According to the passage, what has drone delivery demonstrated in countries like Rwanda and Ghana?',
+        options:['It has completely replaced traditional road-based delivery systems.','It has successfully lowered the overall cost of healthcare in rural areas.','It has significantly reduced the time needed to deliver blood products to hospitals.','It has helped to construct new road infrastructure in remote regions.'],
+        correctAnswer:2, explanation:'第3段落に "dramatically reduced the time required to deliver blood products to hospitals in urgent situations" とあります。ルワンダやガーナでのドローン配送は血液製剤を病院に届けるのに必要な時間を大幅に短縮しました。正解は (3) です。' },
+      { id:2, text:'What is mentioned as a challenge to widespread drone use in the passage?',
+        options:['The high cost of manufacturing drones makes them unaffordable for most businesses.','Drone-captured images are insufficient for detecting structural problems in buildings.','Agricultural drones cannot fly in poor weather conditions, limiting their usefulness.','Privacy concerns and regulatory challenges limit how broadly drones can be deployed.'],
+        correctAnswer:3, explanation:'最終段落に "widespread drone use raises concerns about privacy... Regulatory bodies in many countries are working to establish frameworks that balance the economic benefits" とあります。プライバシーへの懸念と規制上の課題が広範な導入を制限しています。正解は (4) です。' }
+    ]
+  },
+  {
+    id: 'n-2-2021-2', level: 2, year: 2021, season: '第2回', number: '長文問題 A',
+    passageTitle: 'The Human Gut Microbiome',
+    passage: `The human body contains approximately 38 trillion bacteria, most of which reside in the large intestine. This vast community of microorganisms, collectively known as the gut microbiome, plays a crucial role in human health that scientists are only beginning to understand. Far from being passive passengers, these bacteria actively influence digestion, immune function, and even mental health.
+
+The gut microbiome assists in breaking down dietary fiber and other complex carbohydrates that human digestive enzymes cannot process. During this breakdown, beneficial bacteria produce short-chain fatty acids, which serve as an energy source for the cells lining the intestine and help maintain the integrity of the gut barrier. A healthy gut barrier prevents harmful substances from entering the bloodstream while allowing nutrients to pass through.
+
+Research has revealed a strong connection between the gut microbiome and the immune system. Approximately 70% of the body's immune cells are located in or near the gut. The microbiome trains these immune cells to distinguish between harmless microorganisms and genuine threats, helping to prevent inappropriate immune responses that can lead to allergies and autoimmune conditions. Studies have found that individuals with reduced microbial diversity in their gut are more likely to develop such conditions.
+
+Perhaps most surprisingly, scientists have discovered a bidirectional communication pathway between the gut and the brain, known as the gut-brain axis. The gut contains millions of nerve cells and produces approximately 90% of the body's serotonin — a neurotransmitter strongly associated with mood regulation. Research suggests that alterations in gut bacteria composition can influence anxiety, depression, and cognitive function.
+
+The composition of the gut microbiome is influenced by numerous factors, including diet, antibiotic use, and early childhood exposures. Diets rich in diverse plant foods tend to promote microbial diversity, while highly processed diets can reduce it. Some researchers are exploring the potential of probiotic supplements and dietary interventions to treat conditions ranging from inflammatory bowel disease to mental health disorders.`,
+    questions: [
+      { id:0, text:'According to the passage, what role do short-chain fatty acids play in the body?',
+        options:['They break down dietary fiber and complex carbohydrates.','They train immune cells to identify genuine threats.','They provide energy for cells lining the intestine.','They produce serotonin needed for mood regulation.'],
+        correctAnswer:2, explanation:'第2段落に "short-chain fatty acids, which serve as an energy source for the cells lining the intestine" とあります。短鎖脂肪酸は腸壁の細胞のエネルギー源として機能します。正解は (3) です。' },
+      { id:1, text:'What does the passage suggest about the relationship between gut bacteria and the immune system?',
+        options:['Gut bacteria prevent immune cells from functioning properly.','A diverse gut microbiome helps prevent allergic and autoimmune conditions.','The immune system produces gut bacteria needed for digestion.','Immune cells located in the gut protect bacteria from antibiotics.'],
+        correctAnswer:1, explanation:'第3段落に "The microbiome trains these immune cells... helping to prevent inappropriate immune responses... individuals with reduced microbial diversity in their gut are more likely to develop such conditions" とあります。多様な腸内微生物叢がアレルギーや自己免疫疾患の予防に役立ちます。正解は (2) です。' },
+      { id:2, text:'What is the gut-brain axis described as in the passage?',
+        options:['A physical connection between the gut lining and brain tissue.','A two-way communication pathway between the gut and brain.','The process by which brain signals regulate digestive bacteria.','A system for producing serotonin in the digestive tract.'],
+        correctAnswer:1, explanation:'第4段落に "a bidirectional communication pathway between the gut and the brain, known as the gut-brain axis" とあります。腸脳軸とは腸と脳の間の双方向のコミュニケーション経路です。正解は (2) です。' }
+    ]
+  },
+  {
+    id: 'n-2-2020-3', level: 2, year: 2020, season: '第3回', number: '長文問題 B',
+    passageTitle: 'Public Libraries in the Digital Age',
+    passage: `Public libraries have existed for centuries as institutions dedicated to providing communities with free access to knowledge and information. In recent decades, however, these institutions have had to adapt significantly in response to digital technology. Rather than becoming obsolete, many libraries have reinvented themselves as vibrant community hubs that offer far more than books.
+
+The digitization of books, magazines, and newspapers has changed how people access information. Many public libraries now offer digital lending services that allow patrons to borrow e-books and audiobooks through smartphone applications, eliminating the need to visit a physical location. However, concerns remain about the pricing practices of publishers, who often charge libraries significantly more for digital lending rights than for physical copies of the same works.
+
+While digital resources have expanded access to information, library buildings themselves have also evolved. Recognizing that many people lack access to computers and high-speed internet at home, many libraries have invested in computer facilities and free Wi-Fi access. This digital inclusion mission has become increasingly important as more government services, job applications, and educational resources move online. Libraries provide essential infrastructure for citizens who might otherwise be digitally excluded.
+
+Modern libraries frequently offer programs that extend well beyond traditional book lending. Maker spaces equipped with 3D printers, laser cutters, and recording studios allow community members to develop creative and technical skills. Libraries also host events ranging from language conversation groups and coding classes to community health screenings. In doing so, they serve as gathering places that foster connection and lifelong learning.
+
+Despite their continuing relevance, public libraries face ongoing funding challenges. As local governments seek to reduce spending, library budgets are often among the first to be cut. Advocates argue that every dollar invested in public libraries generates several times that amount in community benefits, making libraries one of the most cost-effective public investments available.`,
+    questions: [
+      { id:0, text:'What challenge does the passage describe regarding digital lending in libraries?',
+        options:['Libraries lack the technology to offer digital lending services.','Publishers charge libraries substantially more for digital lending rights than for physical books.','Patrons prefer physical books over e-books and rarely use digital services.','Digital lending reduces the need for library buildings, leading to closures.'],
+        correctAnswer:1, explanation:'第2段落に "publishers... often charge libraries significantly more for digital lending rights than for physical copies" とあります。出版社がデジタル貸出権に対して物理的書籍より大幅に高い料金を請求することが課題として述べられています。正解は (2) です。' },
+      { id:1, text:'According to the passage, why has the "digital inclusion mission" become more important for libraries?',
+        options:['Libraries need to replace their physical collections with digital resources.','More public services, job applications, and education are moving online.','People are reading fewer books and need encouragement to read more.','Libraries compete with bookstores that offer free Wi-Fi access.'],
+        correctAnswer:1, explanation:'第3段落に "increasingly important as more government services, job applications, and educational resources move online" とあります。政府サービス・就職活動・教育リソースのオンライン化が進むにつれデジタルインクルージョンの使命が重要性を増しています。正解は (2) です。' },
+      { id:2, text:'According to the passage, what do advocates argue about investment in public libraries?',
+        options:['Library investment reduces the need for other community services.','Library buildings should be replaced with digital infrastructure.','Every dollar invested in libraries generates several times that in community value.','Library budgets should be managed by private organizations rather than governments.'],
+        correctAnswer:2, explanation:'最終段落に "every dollar invested in public libraries generates several times that amount in community benefits" とあります。図書館への投資はその何倍もの地域社会的便益を生むと提唱者は主張しています。正解は (3) です。' }
+    ]
+  }
+,
+  {
+    id: 'n-1-2023-3', level: 1, year: 2023, season: '第3回', number: '長文問題 A',
+    passageTitle: 'The Neuroscience of Creativity',
+    passage: `The nature of creativity has fascinated philosophers, artists, and scientists for centuries. Only relatively recently have neuroscientists developed the tools necessary to investigate what actually occurs in the brain when people engage in creative thinking. The emerging picture challenges many popular assumptions about how creative ideas arise.
+
+For decades, creativity was popularly associated with the right hemisphere of the brain, while logical thinking was attributed to the left hemisphere. This dichotomy, though appealing in its simplicity, has been largely discredited by modern neuroscience. Brain imaging studies have consistently found that creative tasks activate widespread networks distributed across both hemispheres, with no single region acting as a creativity center. Instead, creative thinking emerges from the coordinated interaction of multiple large-scale brain networks.
+
+Neuroscientists have identified three networks that appear particularly important in the creative process. The default mode network, which is active when people are not focused on specific tasks — during daydreaming or mind-wandering — is associated with generating novel ideas and making unexpected connections between distant concepts. The executive control network is engaged when people deliberately focus attention and evaluate ideas critically. The salience network serves as a switching mechanism, directing attention between these two systems. Effective creativity seems to require the flexible and coordinated operation of all three networks.
+
+This framework helps explain a phenomenon that many creative individuals report: significant insights often arise not during intense focused work but during relaxed states — while walking, bathing, or lying in bed. During such activities, the default mode network becomes highly active, allowing the mind to make associative connections across a wider range of stored knowledge than is possible during focused concentration. The subsequent engagement of the executive control network then allows these raw ideas to be evaluated and refined.
+
+The neuroscience of creativity also sheds light on enhancement techniques. Meditation has been shown to increase connectivity between brain regions, potentially facilitating flexible network interactions associated with creative thinking. Research into sleep suggests that REM sleep, during which the brain makes highly associative connections, may be particularly important for creative problem-solving. Conversely, high levels of stress have been found to restrict activity in the default mode network, potentially explaining why creativity often suffers under pressure.
+
+Despite this progress, significant mysteries remain. The precise neural mechanisms by which disparate pieces of stored information are combined into genuinely novel ideas have not yet been fully described. Some researchers also note that the most valuable aspects of human creativity — aesthetic judgment, the decision of what makes one idea better than another — remain deeply resistant to computational explanation.`,
+    questions: [
+      { id:0, text:'What does the passage suggest about the popular "left brain/right brain" theory of creativity?',
+        options:['It has been validated by modern brain imaging technologies.','It is partially correct because creative tasks primarily activate the right hemisphere.','It has been undermined by evidence that creativity involves widespread brain networks.','It accurately describes how analytical thinking differs from creative thinking.'],
+        correctAnswer:2, explanation:'第2段落に "This dichotomy... has been largely discredited by modern neuroscience. Brain imaging studies... found that creative tasks activate widespread networks distributed across both hemispheres" とあります。左脳/右脳の二分法は現代神経科学によってほぼ否定されており、創造的思考は両半球にまたがる広範なネットワークを活性化させます。正解は (3) です。' },
+      { id:1, text:'According to the passage, what role does the default mode network play in creativity?',
+        options:['It evaluates and refines creative ideas that have already been generated.','It directs attention between different neural networks as a switching mechanism.','It produces insights by enabling focused analytical concentration.','It generates novel ideas by connecting distant concepts during relaxed states.'],
+        correctAnswer:3, explanation:'第3段落に "The default mode network... is associated with generating novel ideas and making unexpected connections between distant concepts" とあります。デフォルトモードネットワークは休息・空想状態に活動し、離れた概念間の予期しない繋がりを形成することで新しいアイデアを生成します。正解は (4) です。' },
+      { id:2, text:'What explanation does the passage offer for insights that arise during relaxed activities?',
+        options:['The brain focuses more intensely during physical activities like walking.','The executive control network becomes more active during relaxation.','The default mode network enables broader associative connections when attention is unfocused.','Creative insights result from the suppression of the salience network during rest.'],
+        correctAnswer:2, explanation:'第4段落に "the default mode network becomes highly active, allowing the mind to make associative connections across a wider range of stored knowledge than is possible during focused concentration" とあります。リラックス状態でデフォルトモードネットワークが活発化し、集中時より広範な知識にわたる連想的なつながりを形成できます。正解は (3) です。' },
+      { id:3, text:'According to the passage, how does stress affect creativity?',
+        options:['It activates the executive control network, which enhances creative evaluation.','It restricts activity in the default mode network, potentially hindering creativity.','It increases connectivity between brain regions involved in creative thinking.','It shifts brain activity away from the salience network toward focused problem-solving.'],
+        correctAnswer:1, explanation:'第5段落に "high levels of stress have been found to restrict activity in the default mode network, potentially explaining why creativity often suffers under pressure" とあります。高いストレスはデフォルトモードネットワークの活動を制限し、圧力下で創造性が低下することへの説明となり得ます。正解は (2) です。' }
+    ]
+  },
+  {
+    id: 'n-1-2022-1', level: 1, year: 2022, season: '第1回', number: '長文問題 B',
+    passageTitle: 'Globalization and Cultural Homogenization',
+    passage: `The acceleration of globalization over the past several decades has prompted extensive scholarly debate about its cultural consequences. Among the most contentious issues is the phenomenon of cultural homogenization — the concern that the spread of global consumer culture, dominant media, and international corporations is eroding the world's cultural diversity, potentially replacing distinct local traditions with a uniform, often Western-influenced, global monoculture.
+
+The evidence for cultural homogenization is visible in patterns of consumption and media across the world. Global fast-food chains, clothing brands, and entertainment products have penetrated markets on every inhabited continent, creating similar consumer landscapes from São Paulo to Seoul. The dominance of English as the language of international business, science, and digital communication has led to concerns that linguistic diversity is being lost as smaller languages lose speakers to more economically advantageous alternatives. UNESCO estimates that approximately half of the world's 7,000 languages are endangered, with many expected to disappear within the coming century.
+
+However, critics of the homogenization thesis argue that the relationship between globalization and cultural change is considerably more complex. Cultural anthropologists have documented numerous instances in which local cultures do not simply absorb global influences but actively transform them, incorporating foreign elements into existing traditions in ways that create new hybrid cultural forms rather than replacing indigenous ones. This process, often called "glocalization," suggests that cultures possess considerable adaptive resilience when confronted with external influences.
+
+Furthermore, globalization has in some respects facilitated rather than suppressed cultural diversity. Digital platforms have given minority cultural producers unprecedented access to global audiences, enabling the survival and even flourishing of musical traditions, craft practices, and artistic forms that might otherwise have been overwhelmed by mainstream commercial culture. The global popularity of previously regionally confined cultural forms — K-pop, anime, Bollywood cinema — suggests that the flow of cultural influence is increasingly multidirectional rather than simply emanating from a Western center.
+
+Yet concerns about cultural power imbalances remain legitimate. The infrastructure of global cultural distribution — platforms, media conglomerates, advertising systems — remains heavily concentrated in a small number of countries and corporations, raising questions about whose values and aesthetics are systematically privileged in global cultural markets. Critics argue that while superficial cultural diversity may be increasing, the economic and structural conditions that allow cultures to genuinely thrive on their own terms remain deeply unequal.`,
+    questions: [
+      { id:0, text:'What concern does the passage identify as central to the cultural homogenization debate?',
+        options:['The replacement of local traditions with a uniform global consumer culture.','The inability of developing countries to participate in global cultural markets.','The dominance of non-Western cultural influences over Western traditions.','The economic losses suffered by local businesses due to global corporations.'],
+        correctAnswer:0, explanation:'第1段落に "the spread of global consumer culture... is eroding the world\'s cultural diversity, potentially replacing distinct local traditions with a uniform, often Western-influenced, global monoculture" とあります。文化的均質化の中心的な懸念は地域の伝統がグローバルな消費文化に置き換えられることです。正解は (1) です。' },
+      { id:1, text:'What does the concept of "glocalization" refer to according to the passage?',
+        options:['The process by which global corporations adapt their products for local markets.','The active transformation of global influences into new hybrid cultural forms.','The gradual replacement of local languages with English in global commerce.','The protection of indigenous cultural practices through international law.'],
+        correctAnswer:1, explanation:'第3段落に "local cultures do not simply absorb global influences but actively transform them, incorporating foreign elements into existing traditions in ways that create new hybrid cultural forms" とあり、このプロセスが「グローカリゼーション」と呼ばれています。正解は (2) です。' },
+      { id:2, text:'How does the passage suggest that globalization has benefited cultural diversity in some ways?',
+        options:['It has reduced the economic dominance of Western cultural industries.','It has enabled minority cultural producers to reach global audiences.','It has provided funding for the preservation of endangered languages.','It has encouraged large corporations to invest in local cultural traditions.'],
+        correctAnswer:1, explanation:'第4段落に "Digital platforms have given minority cultural producers unprecedented access to global audiences, enabling the survival and even flourishing of musical traditions, craft practices, and artistic forms" とあります。デジタルプラットフォームがマイノリティの文化的生産者にグローバルな視聴者へのアクセスを与えています。正解は (2) です。' },
+      { id:3, text:'According to the passage, what concern about global cultural distribution remains even as cultural diversity increases?',
+        options:['Global audiences have shown little interest in non-Western cultural products.','Digital platforms are reducing the economic value of all cultural content.','The infrastructure of cultural distribution is concentrated in few countries and corporations.','Cultural exchange is occurring too rapidly for local traditions to adapt.'],
+        correctAnswer:2, explanation:'最終段落に "The infrastructure of global cultural distribution... remains heavily concentrated in a small number of countries and corporations, raising questions about whose values and aesthetics are systematically privileged" とあります。文化流通のインフラが少数の国と企業に集中し、誰の価値観が優先されるかという問題が残っています。正解は (3) です。' }
+    ]
+  },
+  {
+    id: 'n-1-2022-2', level: 1, year: 2022, season: '第2回', number: '長文問題 A',
+    passageTitle: 'The Ethics of CRISPR Gene Editing',
+    passage: `The development of CRISPR-Cas9 gene editing technology has presented humanity with extraordinary possibilities and equally profound ethical dilemmas. Unlike previous genetic engineering techniques, CRISPR allows scientists to make precise, targeted modifications to DNA sequences with relative ease and low cost, dramatically lowering the barriers to genetic intervention in plants, animals, and human cells.
+
+In the medical field, the therapeutic potential of CRISPR is considerable. Clinical trials are underway using CRISPR-based treatments for genetic conditions including sickle cell disease and certain forms of blindness, and early results have been promising. Somatic gene therapy — editing the cells of living patients — is generally considered ethically acceptable within the medical community, provided it meets standard criteria for safety and efficacy, as its effects are limited to the individual being treated and are not inherited by future generations.
+
+The prospect of germline editing, however — modifying reproductive cells or embryos so that genetic changes are passed to all subsequent generations — raises far more contentious ethical questions. In 2018, a Chinese researcher announced the birth of twin girls whose embryos had been modified using CRISPR to confer resistance to HIV. The announcement provoked immediate and widespread condemnation from the scientific community. Critics argued that the intervention was premature given current safety uncertainties, unnecessary because safer ways to prevent HIV transmission exist, and potentially harmful because the consequences of deliberately altering the human germline are not yet understood.
+
+Beyond immediate safety concerns lies the more fundamental question of whether germline editing constitutes an ethically permissible form of human enhancement or an impermissible form of "designer baby" creation. Proponents argue that preventing heritable genetic diseases is a natural extension of medicine's objective to reduce suffering. Opponents argue that selecting or modifying heritable traits violates important principles: it could limit the autonomy of future generations who have no say in the matter, exacerbate social inequalities if enhancements are available only to the wealthy, and reflect a troubling attitude toward human imperfection and diversity.
+
+The governance of gene editing technology presents another significant challenge. Genetic modifications made in one country under permissive regulatory conditions can easily cross international borders, making it difficult for any single nation's regulations to effectively govern the technology. International scientific bodies have called for coordinated global oversight mechanisms, but achieving meaningful international consensus on bioethical issues has historically proven formidable.`,
+    questions: [
+      { id:0, text:'According to the passage, why is somatic gene therapy generally considered ethically acceptable?',
+        options:['It has already been proven completely safe and effective in clinical trials.','Its effects are confined to the individual and are not passed to future generations.','It is less expensive than other forms of genetic intervention.','It is performed only on adults who can give informed consent.'],
+        correctAnswer:1, explanation:'第2段落に "its effects are limited to the individual being treated and are not inherited by future generations" とあります。体細胞遺伝子治療が倫理的に許容されるとされる主な理由は、その効果が治療を受ける個人に限定され将来の世代に受け継がれないことです。正解は (2) です。' },
+      { id:1, text:'According to the passage, why did the scientific community condemn the 2018 CRISPR baby announcement?',
+        options:['The researcher used outdated CRISPR technology known to be unreliable.','The modification was premature, unnecessary, and potentially harmful.','The twins were found to have experienced serious adverse health effects.','The research was conducted without any government oversight or approval.'],
+        correctAnswer:1, explanation:'第3段落に "Critics argued that the intervention was premature given current safety uncertainties, unnecessary because safer ways to prevent HIV transmission exist, and potentially harmful" とあります。科学界は時期尚早・不必要・潜在的に有害という3点からこの発表を批判しました。正解は (2) です。' },
+      { id:2, text:'What concern about germline editing do critics emphasize regarding future generations?',
+        options:['Future generations may be unable to benefit from further advances in gene therapy.','The genetic modifications could become less effective in subsequent generations.','Future generations have no voice in decisions about their heritable traits.','Genetic enhancements will eliminate natural variation needed for human survival.'],
+        correctAnswer:2, explanation:'第4段落に "it could limit the autonomy of future generations who have no say in the matter" とあります。批判者は将来の世代が自分の遺伝形質についての決定に発言権を持たないという懸念を強調しています。正解は (3) です。' },
+      { id:3, text:'What challenge in governing gene editing technology does the passage identify?',
+        options:['Most governments lack scientists with sufficient expertise to regulate the technology.','Gene editing companies lobby governments to prevent restrictive regulations.','Genetic modifications made in permissive countries can cross international borders.','International scientific bodies disagree about the fundamental risks of the technology.'],
+        correctAnswer:2, explanation:'最終段落に "Genetic modifications made in one country under permissive regulatory conditions can easily cross international borders, making it difficult for any single nation\'s regulations to effectively govern the technology" とあります。規制の緩い国で行われた遺伝子改変が国境を容易に越えられるため単一国家の規制では統制が難しいという課題があります。正解は (3) です。' }
+    ]
+  },
+  {
+    id: 'n-1-2021-1', level: 1, year: 2021, season: '第1回', number: '長文問題 B',
+    passageTitle: 'Behavioral Economics and Nudge Theory',
+    passage: `Classical economic theory rested on the assumption that human beings are fundamentally rational agents who consistently make decisions that maximize their own utility. This model, sometimes embodied in the figure of "Homo Economicus," provided the theoretical foundation for much of twentieth-century economics and policy. However, a growing body of experimental research has revealed systematic patterns of decision-making that deviate significantly from rational choice predictions — findings that gave rise to the field of behavioral economics.
+
+Two of the most influential figures in the development of behavioral economics were psychologists Daniel Kahneman and Amos Tversky, whose collaborative research in the 1970s and 1980s identified numerous cognitive biases — systematic errors in human judgment — that affect economic decision-making. Their prospect theory, for which Kahneman later received the Nobel Prize in Economics, demonstrated that people do not evaluate outcomes in terms of absolute values but relative to a reference point, and that losses are felt more intensely than equivalent gains — a phenomenon known as loss aversion. This asymmetry influences decisions ranging from investment behavior to healthcare choices.
+
+Another significant finding concerns the effect of how choices are presented — what behavioral economists call framing effects. Studies have found that people respond differently to economically identical options depending on whether they are described in terms of potential gains or potential losses. A medical treatment described as having a 90% survival rate attracts more support than one described as having a 10% mortality rate, even though these descriptions convey identical information. Similarly, people make systematically different retirement savings decisions depending on whether a contribution scheme requires active enrollment or makes enrollment the default option.
+
+This last observation gave rise to the concept of nudging — using the design of choice environments to steer individuals toward decisions that are in their own best interests, without restricting their freedom to choose otherwise. Governments in the United Kingdom, the United States, and several other countries have established nudge units — departments dedicated to applying behavioral insights to improve policy outcomes. Interventions have ranged from changing default font sizes on tax notices to redesigning cafeteria layouts to encourage healthier food choices in schools.
+
+The application of behavioral insights to public policy is not without controversy. Critics from both progressive and libertarian traditions have raised concerns about the paternalistic assumption that governments can reliably determine what is in citizens' best interests, and about the potential for nudge techniques to be used manipulatively by corporations or governments pursuing objectives that do not align with citizens' own preferences.`,
+    questions: [
+      { id:0, text:'What does prospect theory, as described in the passage, primarily demonstrate?',
+        options:['People consistently make rational decisions that maximize their long-term self-interest.','Economic gains and losses are evaluated objectively based on their absolute monetary value.','People evaluate outcomes relative to a reference point and feel losses more strongly than equivalent gains.','Human decision-making is primarily influenced by social comparison with others.'],
+        correctAnswer:2, explanation:'第2段落に "people do not evaluate outcomes in terms of absolute values but relative to a reference point, and that losses are felt more intensely than equivalent gains — a phenomenon known as loss aversion" とあります。プロスペクト理論は結果を参照点に対して評価し損失を利益より強く感じることを実証しました。正解は (3) です。' },
+      { id:1, text:'What does the example of the medical treatment in the passage illustrate?',
+        options:['People prefer treatments with higher survival rates over equally effective alternatives.','Medical decisions are typically made based on accurate statistical reasoning.','The presentation of identical information in different ways changes people\'s responses.','Healthcare policies should be determined by absolute statistics rather than relative descriptions.'],
+        correctAnswer:2, explanation:'第3段落に "people respond differently to economically identical options depending on whether they are described in terms of potential gains or potential losses" とあります。生存率90%と死亡率10%という同一情報でも提示方法が異なると反応が変わるというフレーミング効果の例です。正解は (3) です。' },
+      { id:2, text:'According to the passage, what is the central idea of nudging?',
+        options:['Requiring citizens to make specific choices that governments determine are beneficial.','Providing financial incentives to encourage people to make healthier choices.','Designing choice environments to guide people toward beneficial decisions while preserving freedom of choice.','Educating the public about cognitive biases so they can make more rational decisions.'],
+        correctAnswer:2, explanation:'第4段落に "using the design of choice environments to steer individuals toward decisions that are in their own best interests, without restricting their freedom to choose otherwise" とあります。ナッジの中心的なアイデアは選択の自由を制限せずに選択環境のデザインを通じて人々を有益な決定へと誘導することです。正解は (3) です。' },
+      { id:3, text:'What criticism of behavioral policy applications does the passage present?',
+        options:['Nudge units have failed to produce measurable improvements in policy outcomes.','Behavioral insights cannot be reliably replicated in real-world policy settings.','The techniques are too expensive for most governments to implement effectively.','There are concerns that the approach is paternalistic or could be used manipulatively.'],
+        correctAnswer:3, explanation:'最終段落に "concerns about the paternalistic assumption that governments can reliably determine what is in citizens\' best interests, and about the potential for nudge techniques to be used manipulatively" とあります。父権主義的な前提と操作的利用の可能性への懸念が批判として挙げられています。正解は (4) です。' }
+    ]
+  },
+  {
+    id: 'n-1-2021-2', level: 1, year: 2021, season: '第2回', number: '長文問題 A',
+    passageTitle: 'The Hard Problem of Consciousness',
+    passage: `Of all the problems in philosophy and science, few have proven as resistant to resolution as the question of consciousness. How and why do physical processes in the brain give rise to subjective experience — the felt quality of seeing red, hearing music, or experiencing pain? This question, characterized by philosopher David Chalmers as "the hard problem of consciousness," continues to challenge researchers from philosophy, neuroscience, and cognitive science alike.
+
+Physicalist approaches to consciousness hold that mental phenomena are ultimately reducible to or identical with physical processes in the brain. Supporters of this view argue that just as the properties of water can be fully explained in terms of hydrogen and oxygen molecules, subjective experience will eventually be explained in terms of neural mechanisms. Progress in neuroscience has identified neural correlates of consciousness — specific patterns of brain activity reliably associated with conscious experience — though critics argue that identifying correlates is not the same as explaining why those physical processes generate experience at all.
+
+The "explanatory gap" identified by philosopher Joseph Levine captures the intuitive difficulty with purely physical explanations of consciousness. Even a complete description of the neural processes occurring when a person sees a red tomato, critics argue, would leave unexplained why there is anything it "feels like" to have that experience. The concept of the "philosophical zombie" — a thought experiment positing a being physically identical to a human but entirely lacking inner experience — is often invoked to illustrate this gap. If such a being is coherently conceivable, then physical facts alone cannot be sufficient to determine facts about consciousness.
+
+In response to these difficulties, some philosophers and scientists have proposed alternatives to standard physicalism. Panpsychism — the view that consciousness or some proto-conscious property is a fundamental feature of matter present at all levels of physical reality — has attracted renewed interest as a potential solution to the explanatory gap. Proponents argue that if consciousness is fundamental rather than emergent, the difficulty of explaining how it arises from non-conscious matter disappears. Critics, however, question whether combining primitive proto-conscious elements can plausibly give rise to the unified, richly qualitative experience that characterizes human consciousness.
+
+Integrated Information Theory (IIT), proposed by neuroscientist Giulio Tononi, represents another influential approach. IIT proposes that consciousness corresponds to the amount of integrated information processed by a system. The theory predicts that any system with sufficiently high integrated information, whether biological or artificial, would have some degree of consciousness. While IIT has generated productive empirical research, critics have raised concerns about whether its mathematical formalism genuinely explains the qualitative character of experience or merely provides a novel way of describing neural correlates.`,
+    questions: [
+      { id:0, text:'What does David Chalmers\'s "hard problem of consciousness" refer to?',
+        options:['The technical difficulty of measuring neural activity associated with conscious states.','The question of how physical brain processes produce subjective experience.','The philosophical debate about whether non-human animals can be conscious.','The challenge of distinguishing genuine consciousness from unconscious processing.'],
+        correctAnswer:1, explanation:'第1段落に "How and why do physical processes in the brain give rise to subjective experience... This question, characterized by philosopher David Chalmers as \'the hard problem of consciousness\'" とあります。チャーマーズの「意識のハード・プロブレム」とは脳の物理的プロセスがいかにして主観的経験を生み出すかという問いを指します。正解は (2) です。' },
+      { id:1, text:'According to the passage, what do critics argue about neural correlates of consciousness?',
+        options:['They provide a complete explanation of why physical processes produce experience.','They demonstrate that consciousness is not a genuine scientific phenomenon.','Finding correlates does not explain why physical processes generate experience.','They show that consciousness arises from a single specific region of the brain.'],
+        correctAnswer:2, explanation:'第2段落に "critics argue that identifying correlates is not the same as explaining why those physical processes generate experience at all" とあります。批評家たちは神経相関を特定することはなぜ物理的プロセスが経験を生成するのかを説明することとは異なると主張しています。正解は (3) です。' },
+      { id:2, text:'What purpose does the "philosophical zombie" thought experiment serve in the passage?',
+        options:['It illustrates that consciousness can exist without any associated physical processes.','It demonstrates that artificial intelligence cannot achieve genuine consciousness.','It shows that a complete physical description would be sufficient to explain consciousness.','It illustrates that physical facts alone may not be sufficient to account for consciousness.'],
+        correctAnswer:3, explanation:'第3段落に "If such a being is coherently conceivable, then physical facts alone cannot be sufficient to determine facts about consciousness" とあります。哲学的ゾンビの思考実験は物理的事実だけでは意識についての事実を決定するのに十分でない可能性を示すために使用されています。正解は (4) です。' },
+      { id:3, text:'What problem do critics identify with panpsychism as a solution to the explanatory gap?',
+        options:['It requires accepting that all physical objects, including rocks and chairs, are conscious.','It is unclear how primitive proto-conscious elements could combine to produce rich unified experience.','It contradicts established findings in neuroscience about neural correlates of consciousness.','It was developed without sufficient empirical evidence to support its fundamental claims.'],
+        correctAnswer:1, explanation:'第4段落に "Critics... question whether combining primitive proto-conscious elements can plausibly give rise to the unified, richly qualitative experience that characterizes human consciousness" とあります。汎心論への批判として原始的な原意識要素を組み合わせることが人間の意識に特徴的な統一された豊かな質的経験を生み出せるかという疑問があります。正解は (2) です。' }
+    ]
+  },
+  {
+    id: 'n-1-2020-3', level: 1, year: 2020, season: '第3回', number: '長文問題 B',
+    passageTitle: 'The Challenge of Antimicrobial Resistance',
+    passage: `Antimicrobial resistance — the ability of microorganisms to withstand drugs designed to kill or inhibit them — has been described by the World Health Organization as one of the greatest threats to global health, food security, and development. The problem is not new: resistance to penicillin was observed within years of its discovery in the 1940s. But the accelerating pace of resistance development combined with a dramatic slowdown in the discovery of new antibiotic classes has created what many experts describe as an approaching public health crisis.
+
+The mechanisms by which bacteria develop resistance are varied and often interconnected. Natural selection drives the process: in any bacterial population, individual organisms with genetic mutations that reduce a drug's effectiveness will survive treatment and reproduce, passing their resistance traits to offspring. Horizontal gene transfer — the exchange of genetic material between bacteria — can also spread resistance rapidly across different species. The extensive use of antibiotics in both human medicine and agricultural settings accelerates this process by providing constant selective pressure that favors resistant strains.
+
+The scale of antibiotic use in agriculture is frequently underappreciated. Globally, a substantial proportion of antibiotics produced are administered to livestock and poultry — not to treat disease but to promote growth and compensate for disease risks associated with intensive farming conditions. This practice spreads antibiotic-resistant bacteria through food products, water systems, and soil. Some countries have moved to restrict the prophylactic use of antibiotics in agriculture, but enforcement and international coordination remain inconsistent.
+
+The pharmaceutical industry's limited investment in antibiotic research and development exacerbates the problem. Developing a new antibiotic requires substantial investment, but the therapeutic models underlying antibiotic use — short treatment courses intended to cure infections rather than manage chronic conditions — offer less commercial return than drugs for long-term conditions. Furthermore, to preserve the efficacy of new antibiotics, their use may need to be severely restricted upon introduction, further limiting revenue potential. These economic structures have led many pharmaceutical companies to deprioritize antibiotic development.
+
+Addressing antimicrobial resistance requires coordinated action at multiple levels. Improved stewardship programs aim to ensure that existing antibiotics are used appropriately — prescribing only when necessary and using full treatment courses to prevent incomplete elimination of infections. Investment incentives for antibiotic development, such as market entry rewards and public funding, are being explored to attract pharmaceutical investment. International coordination is essential because resistance transcends national borders, but the governance mechanisms required to achieve meaningful global action remain underdeveloped.`,
+    questions: [
+      { id:0, text:'According to the passage, what combination of factors has made antimicrobial resistance an increasingly urgent problem?',
+        options:['The overuse of antibiotics combined with insufficient public awareness campaigns.','Rapid resistance development combined with a decline in new antibiotic discovery.','Poor infection control in hospitals combined with inadequate patient compliance.','Bacterial mutation combined with a lack of international cooperation on drug approval.'],
+        correctAnswer:1, explanation:'第1段落に "The accelerating pace of resistance development combined with a dramatic slowdown in the discovery of new antibiotic classes has created what many experts describe as an approaching public health crisis" とあります。耐性発達の加速と新しい抗生物質クラスの発見の鈍化の組み合わせが問題をより深刻にしています。正解は (2) です。' },
+      { id:1, text:'According to the passage, why does antibiotic use in agriculture pose risks beyond individual animals?',
+        options:['Agricultural antibiotics are more potent than those used in human medicine.','Antibiotic-resistant bacteria spread through food, water, and soil.','Animal diseases caused by resistant bacteria can be directly transmitted to humans.','Agricultural antibiotic use makes existing vaccines for livestock ineffective.'],
+        correctAnswer:1, explanation:'第3段落に "This practice spreads antibiotic-resistant bacteria through food products, water systems, and soil" とあります。農業での抗生物質使用は食品・水・土壌を通じて抗生物質耐性菌を拡散させます。正解は (2) です。' },
+      { id:2, text:'What economic factor does the passage identify as discouraging pharmaceutical investment in antibiotics?',
+        options:['The high cost of clinical trials makes antibiotic development prohibitively expensive.','The short treatment model provides less commercial return than drugs for chronic conditions.','Governments have imposed price controls that limit the profitability of antibiotic sales.','Patent protections for antibiotics expire too quickly for companies to recoup investments.'],
+        correctAnswer:1, explanation:'第4段落に "the therapeutic models underlying antibiotic use — short treatment courses intended to cure infections rather than manage chronic conditions — offer less commercial return than drugs for long-term conditions" とあります。短期治療コースというモデルは慢性疾患治療薬と比較して商業的リターンが少なく製薬会社の投資意欲を削いでいます。正解は (2) です。' },
+      { id:3, text:'According to the passage, why is international coordination particularly important in addressing antimicrobial resistance?',
+        options:['International agencies possess superior scientific expertise for developing new antibiotics.','Most antibiotic-resistant bacteria originate in specific countries with poor healthcare systems.','Individual countries cannot independently fund the research needed to solve the problem.','Resistance is not confined within national borders, making national regulations insufficient alone.'],
+        correctAnswer:3, explanation:'最終段落に "International coordination is essential because resistance transcends national borders" とあります。耐性が国境を越えるため国際的な協調が不可欠であり、個々の国家の規制だけでは不十分です。正解は (4) です。' }
+    ]
+  }
+
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let S = {
+  view: 'list',        // 'list' | 'problem' | 'progress' | 'bookmarks'
+  filterLevel: 'all',
+  filterYear: 'all',
+  problemId: null,
+  qIdx: 0,
+  selectedAnswer: null,
+  showOcr: false,
+  ocrProcessing: false,
+  ocrImage: null,
+  ocrText: '',
+  showAdd: false,
+  addPrefill: '',
+};
+
+let U = { progress: {}, bookmarks: [], custom: [] };
+
+function loadU() {
+  try { const d = localStorage.getItem('eiken_v1'); if (d) U = {...U, ...JSON.parse(d)}; } catch(e) {}
+}
+function saveU() {
+  try { localStorage.setItem('eiken_v1', JSON.stringify(U)); } catch(e) {}
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function allProblems() { return [...SAMPLE_PROBLEMS, ...U.custom]; }
+
+function filteredProblems() {
+  let ps = allProblems();
+  if (S.filterLevel !== 'all') ps = ps.filter(p => p.level === +S.filterLevel);
+  if (S.filterYear !== 'all') ps = ps.filter(p => p.year === +S.filterYear);
+  return ps;
+}
+
+function problem(id) { return allProblems().find(p => p.id === id); }
+function prog(id) { return U.progress[id] || {}; }
+function bookmarked(id) { return U.bookmarks.includes(id); }
+
+function toggleBM(id) {
+  U.bookmarks = bookmarked(id) ? U.bookmarks.filter(x => x !== id) : [...U.bookmarks, id];
+  saveU(); render();
+}
+
+function recordAnswer(problemId, qIdx, sel, correct) {
+  if (!U.progress[problemId]) U.progress[problemId] = {};
+  U.progress[problemId][qIdx] = { sel, correct: sel === correct, at: Date.now() };
+  saveU();
+}
+
+function stats() {
+  let tot=0, ans=0, cor=0, l1={t:0,a:0,c:0}, l2={t:0,a:0,c:0};
+  allProblems().forEach(p => {
+    const lv = p.level === 1 ? l1 : l2;
+    p.questions.forEach((q,i) => {
+      tot++; lv.t++;
+      const r = (U.progress[p.id]||{})[i];
+      if (r) { ans++; lv.a++; if(r.correct){cor++;lv.c++;} }
+    });
+  });
+  return {tot,ans,cor,l1,l2};
+}
+
+function years() {
+  return [...new Set(allProblems().map(p=>p.year))].sort((a,b)=>b-a);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function go(view, extra={}) {
+  Object.assign(S, {view, ...extra});
+  render(); window.scrollTo(0,0);
+}
+
+function openProblem(id) {
+  S.problemId = id; S.qIdx = 0; S.selectedAnswer = null;
+  go('problem');
+}
+
+function setFilter(type, val) {
+  if(type==='level') S.filterLevel = val;
+  if(type==='year') S.filterYear = val;
+  render();
+}
+
+function selectOpt(i) {
+  const p = problem(S.problemId);
+  if (!p || (prog(S.problemId)[S.qIdx] !== undefined)) return;
+  S.selectedAnswer = i; render();
+}
+
+function submitAns() {
+  if (S.selectedAnswer === null) return;
+  const p = problem(S.problemId);
+  const q = p.questions[S.qIdx];
+  recordAnswer(S.problemId, S.qIdx, S.selectedAnswer, q.correctAnswer);
+  render();
+}
+
+function goQ(i) {
+  S.qIdx = i; S.selectedAnswer = null; render();
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  document.getElementById('app').innerHTML =
+    header() + `<div class="max-w-5xl mx-auto px-4 py-6">${viewContent()}</div>` +
+    ocrModal() + addModal();
+}
+
+// ---- HEADER ----
+function header() {
+  const tabs = [
+    {v:'list',   label:'📚 問題一覧'},
+    {v:'progress',label:'📊 進捗'},
+    {v:'bookmarks',label:'🔖 ブックマーク'},
+  ];
+  return `
+  <header class="bg-white shadow-sm sticky top-0 z-40">
+    <div class="max-w-5xl mx-auto px-4">
+      <div class="flex items-center justify-between h-16 gap-4">
+        <div class="flex items-center gap-2 cursor-pointer flex-shrink-0" onclick="go('list')">
+          <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <span class="text-white text-sm font-black">英</span>
+          </div>
+          <span class="font-bold text-slate-800 hidden sm:block">英検 長文問題アプリ</span>
+        </div>
+        <nav class="flex items-center gap-1">
+          ${tabs.map(t=>`
+            <button onclick="go('${t.v}')"
+              class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap
+                ${S.view===t.v ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-100'}">
+              ${t.label}
+            </button>`).join('')}
+          <button onclick="showAdd()"
+            class="ml-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors whitespace-nowrap">
+            ＋ 問題追加
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>`;
+}
+
+// ---- VIEW ROUTER ----
+function viewContent() {
+  if (S.view==='list')      return listView();
+  if (S.view==='problem')   return problemView();
+  if (S.view==='progress')  return progressView();
+  if (S.view==='bookmarks') return bookmarksView();
+  return listView();
+}
+
+// ---- LIST VIEW ----
+function listView() {
+  const ps = filteredProblems();
+  const ys = years();
+  return `
+  <div class="fade-in">
+    <div class="bg-white rounded-2xl shadow-sm p-4 mb-5 flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">級</span>
+        ${['all','1','2'].map(lv=>`
+          <button onclick="setFilter('level','${lv}')"
+            class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all
+              ${S.filterLevel===lv
+                ? (lv==='1'?'bg-purple-600 text-white':lv==='2'?'bg-emerald-600 text-white':'bg-indigo-600 text-white')
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+            ${lv==='all'?'全て':lv+'級'}
+          </button>`).join('')}
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">年度</span>
+        <select onchange="setFilter('year',this.value)"
+          class="px-3 py-1.5 rounded-lg text-sm border border-slate-200 bg-white text-slate-700 cursor-pointer">
+          <option value="all" ${S.filterYear==='all'?'selected':''}>全年度</option>
+          ${ys.map(y=>`<option value="${y}" ${S.filterYear==y?'selected':''}>${y}年度</option>`).join('')}
+        </select>
+      </div>
+      <span class="ml-auto text-xs text-slate-400">${ps.length}件</span>
+    </div>
+    <div class="grid gap-4 sm:grid-cols-2">
+      ${ps.map(p=>problemCard(p)).join('')}
+    </div>
+    ${ps.length===0?`<div class="text-center py-16 text-slate-300"><div class="text-5xl mb-3">📚</div><p class="text-slate-400">該当する問題がありません</p></div>`:''}
+  </div>`;
+}
+
+function problemCard(p) {
+  const pr = prog(p.id);
+  const answered = Object.keys(pr).length;
+  const correct  = Object.values(pr).filter(x=>x.correct).length;
+  const total    = p.questions.length;
+  const pct      = answered>0 ? Math.round(correct/answered*100) : 0;
+  const bm       = bookmarked(p.id);
+  const lvCls    = p.level===1 ? 'bg-purple-100 text-purple-700' : 'bg-emerald-100 text-emerald-700';
+  const barCls   = pct>=80?'bg-emerald-500':pct>=50?'bg-amber-400':'bg-indigo-400';
+
+  return `
+  <div class="bg-white rounded-2xl shadow-sm p-5 card-hover cursor-pointer border border-transparent hover:border-slate-200"
+    onclick="openProblem('${p.id}')">
+    <div class="flex items-start justify-between mb-3">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${lvCls}">${p.level}級</span>
+        <span class="text-xs text-slate-400">${p.year}年度 ${p.season}</span>
+      </div>
+      <button onclick="event.stopPropagation();toggleBM('${p.id}')"
+        class="text-lg hover:scale-110 transition-transform leading-none">
+        ${bm?'🔖':'🏷️'}
+      </button>
+    </div>
+    <p class="text-xs font-medium text-slate-400 mb-0.5">${p.number}</p>
+    <h3 class="font-bold text-slate-800 mb-4 text-[15px] leading-snug">${p.passageTitle}</h3>
+    <div class="flex items-center gap-3">
+      <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full ${barCls} rounded-full progress-bar" style="width:${answered>0?Math.round(answered/total*100):0}%"></div>
+      </div>
+      <span class="text-xs text-slate-400 whitespace-nowrap">
+        ${answered>0?`${answered}/${total}問 · ${pct}%正解`:total+'問'}
+      </span>
+    </div>
+    ${answered===total && total>0 ? `<p class="text-xs text-emerald-600 font-semibold mt-2">✓ 完了</p>`:''}
+  </div>`;
+}
+
+// ---- PROBLEM VIEW ----
+function problemView() {
+  const p = problem(S.problemId);
+  if (!p) return '<p class="text-slate-400">問題が見つかりません</p>';
+  const q  = p.questions[S.qIdx];
+  const pr = prog(p.id);
+  const cur = pr[S.qIdx];
+  const lvBg = p.level===1?'bg-purple-100 text-purple-700':'bg-emerald-100 text-emerald-700';
+
+  return `
+  <div class="fade-in">
+    <!-- Top bar -->
+    <div class="flex items-center gap-3 mb-5 flex-wrap">
+      <button onclick="go('list')" class="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 transition-colors text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        一覧
+      </button>
+      <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${lvBg}">${p.level}級</span>
+      <span class="text-xs text-slate-400">${p.year}年度 ${p.season} · ${p.number}</span>
+      <button onclick="toggleBM('${p.id}')" class="ml-auto text-xl hover:scale-110 transition-transform">
+        ${bookmarked(p.id)?'🔖':'🏷️'}
+      </button>
+    </div>
+
+    <div class="grid gap-5 lg:grid-cols-[1fr_420px]">
+      <!-- Passage -->
+      <div class="bg-white rounded-2xl shadow-sm p-6">
+        <h2 class="font-black text-slate-800 text-lg mb-3">${p.passageTitle}</h2>
+        <hr class="border-slate-100 mb-4">
+        <div class="passage-text text-[14.5px] text-slate-700 whitespace-pre-line">${p.passage}</div>
+      </div>
+
+      <!-- Questions panel -->
+      <div>
+        <!-- Q nav -->
+        <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-slate-400 mr-1">問</span>
+            ${p.questions.map((_,i)=>{
+              const r = pr[i];
+              return `<button onclick="goQ(${i})"
+                class="w-9 h-9 rounded-full text-sm font-bold transition-all
+                  ${i===S.qIdx?'ring-2 ring-indigo-400 ring-offset-1 ':''}
+                  ${r?(r.correct?'bg-emerald-100 text-emerald-700':'bg-red-100 text-red-600'):'bg-slate-100 text-slate-500'}">
+                ${i+1}
+              </button>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Question card -->
+        <div class="bg-white rounded-2xl shadow-sm p-5 fade-in">
+          <p class="text-[14px] font-medium text-slate-800 leading-relaxed mb-4">
+            <span class="font-black text-indigo-600 mr-1.5">Q${S.qIdx+1}.</span>${q.text}
+          </p>
+
+          <div class="space-y-2.5">
+            ${q.options.map((opt,i)=>{
+              let cls = 'bg-white border-2 border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-indigo-50';
+              if (cur !== undefined) {
+                if (i===q.correctAnswer)      cls = 'answered bg-emerald-50 border-2 border-emerald-400 text-emerald-800';
+                else if (i===cur.sel && !cur.correct) cls = 'answered bg-red-50 border-2 border-red-400 text-red-700';
+                else                          cls = 'answered bg-white border-2 border-slate-100 text-slate-400';
+              } else if (S.selectedAnswer===i) cls = 'bg-indigo-50 border-2 border-indigo-400 text-indigo-800';
+              const disabled = cur!==undefined ? 'pointer-events-none' : '';
+              return `<button onclick="selectOpt(${i})"
+                class="w-full text-left px-4 py-2.5 rounded-xl opt-btn text-[13.5px] font-medium ${cls} ${disabled}">
+                <span class="font-bold mr-1.5">(${i+1})</span>${opt}
+              </button>`;
+            }).join('')}
+          </div>
+
+          ${cur !== undefined ? `
+            <!-- Result + Explanation -->
+            <div class="mt-4 fade-in">
+              <div class="flex items-center gap-3 p-3 rounded-xl mb-3 ${cur.correct?'bg-emerald-50':'bg-red-50'}">
+                <span class="text-2xl">${cur.correct?'⭕':'❌'}</span>
+                <p class="font-bold text-sm ${cur.correct?'text-emerald-700':'text-red-700'}">
+                  ${cur.correct?'正解！':'不正解。正解は ('+(q.correctAnswer+1)+') です'}
+                </p>
+              </div>
+              <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                <p class="text-xs font-bold text-amber-600 mb-1.5">📖 解説</p>
+                <p class="text-[13px] text-slate-700 leading-relaxed">${q.explanation}</p>
+              </div>
+              <div class="flex gap-2.5 mt-4">
+                ${S.qIdx>0?`<button onclick="goQ(${S.qIdx-1})" class="flex-1 py-2.5 border-2 border-slate-200 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-50">← 前</button>`:'<div class="flex-1"></div>'}
+                ${S.qIdx<p.questions.length-1
+                  ?`<button onclick="goQ(${S.qIdx+1})" class="flex-1 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700">次の問題 →</button>`
+                  :`<button onclick="go('list')" class="flex-1 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700">✓ 完了</button>`}
+              </div>
+            </div>
+          ` : `
+            <button onclick="submitAns()"
+              class="w-full mt-4 py-2.5 rounded-xl text-sm font-bold transition-all
+                ${S.selectedAnswer!==null?'bg-indigo-600 text-white hover:bg-indigo-700':'bg-slate-100 text-slate-400 cursor-not-allowed'}">
+              解答する
+            </button>
+          `}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ---- PROGRESS VIEW ----
+function progressView() {
+  const st = stats();
+  const pct = st.ans>0 ? Math.round(st.cor/st.ans*100) : 0;
+
+  function lvCard(lv, d) {
+    const p = d.a>0 ? Math.round(d.c/d.a*100) : 0;
+    const [bg,bar,badge] = lv===1
+      ? ['bg-white','bg-purple-500','bg-purple-100 text-purple-700']
+      : ['bg-white','bg-emerald-500','bg-emerald-100 text-emerald-700'];
+    return `
+    <div class="${bg} rounded-2xl shadow-sm p-5">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="px-3 py-0.5 rounded-full text-sm font-bold ${badge}">${lv}級</span>
+        <span class="text-xs text-slate-400">${d.t}問</span>
+      </div>
+      <div class="flex items-end gap-1.5 mb-1">
+        <span class="text-4xl font-black text-slate-800">${p}</span>
+        <span class="text-slate-400 text-base mb-1">%</span>
+      </div>
+      <p class="text-xs text-slate-400 mb-3">正解率（${d.a}問回答・${d.c}問正解）</p>
+      <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div class="h-full ${bar} rounded-full progress-bar" style="width:${p}%"></div>
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div class="fade-in">
+    <h2 class="text-2xl font-black text-slate-800 mb-5">学習進捗</h2>
+    <div class="grid grid-cols-3 gap-4 mb-5">
+      ${[
+        {v:st.ans,  l:'回答済み問題数', cls:'text-slate-800'},
+        {v:pct+'%', l:'全体正解率',      cls:pct>=80?'text-emerald-600':pct>=60?'text-amber-500':'text-red-500'},
+        {v:U.bookmarks.length, l:'ブックマーク', cls:'text-slate-800'},
+      ].map(x=>`
+        <div class="bg-white rounded-2xl shadow-sm p-4 text-center">
+          <div class="text-3xl font-black ${x.cls}">${x.v}</div>
+          <div class="text-xs text-slate-400 mt-1">${x.l}</div>
+        </div>`).join('')}
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4 mb-5">
+      ${lvCard(1,st.l1)}
+      ${lvCard(2,st.l2)}
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm p-5">
+      <h3 class="font-bold text-slate-700 mb-4">問題別進捗</h3>
+      <div class="space-y-2">
+        ${allProblems().map(p=>{
+          const pr = prog(p.id);
+          const a  = Object.keys(pr).length;
+          const c  = Object.values(pr).filter(x=>x.correct).length;
+          const t  = p.questions.length;
+          const pp = a>0 ? Math.round(c/a*100) : 0;
+          const lvCls = p.level===1?'bg-purple-100 text-purple-700':'bg-emerald-100 text-emerald-700';
+          const barCls= pp>=80?'bg-emerald-500':pp>=50?'bg-amber-400':'bg-red-400';
+          return `
+          <div class="flex items-center gap-3 p-2 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors -mx-2"
+            onclick="openProblem('${p.id}')">
+            <span class="text-xs px-2 py-0.5 rounded-full font-bold ${lvCls} whitespace-nowrap">${p.level}級</span>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-slate-700 truncate">${p.passageTitle}</p>
+              <div class="h-1.5 bg-slate-100 rounded-full mt-1 overflow-hidden">
+                <div class="h-full ${barCls} rounded-full" style="width:${a>0?Math.round(a/t*100):0}%"></div>
+              </div>
+            </div>
+            <span class="text-xs text-slate-400 whitespace-nowrap">${a>0?pp+'%':'未回答'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ---- BOOKMARKS VIEW ----
+function bookmarksView() {
+  const bms = allProblems().filter(p=>bookmarked(p.id));
+  return `
+  <div class="fade-in">
+    <h2 class="text-2xl font-black text-slate-800 mb-5">ブックマーク</h2>
+    ${bms.length===0 ? `
+      <div class="text-center py-16">
+        <div class="text-5xl mb-3">🔖</div>
+        <p class="text-slate-400">ブックマークした問題はありません</p>
+        <p class="text-sm text-slate-300 mt-1">問題カードの 🏷️ をタップして追加できます</p>
+      </div>
+    ` : `<div class="grid gap-4 sm:grid-cols-2">${bms.map(p=>problemCard(p)).join('')}</div>`}
+  </div>`;
+}
+
+// ---- OCR MODAL ----
+function ocrModal() {
+  if (!S.showOcr) return '';
+  return `
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="closeOcr()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-bold text-lg text-slate-800">📷 画像OCR読み取り</h3>
+          <button onclick="closeOcr()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">✕</button>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">過去問や参考書の画像をアップロードしてテキストを読み取ります。</p>
+
+        <div class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center cursor-pointer hover:border-indigo-400 transition-colors"
+          onclick="document.getElementById('ocr-input').click()">
+          ${S.ocrImage
+            ? `<img src="${S.ocrImage}" class="max-h-36 mx-auto rounded-lg mb-2 object-contain">`
+            : `<div class="text-4xl mb-1">📁</div>`}
+          <p class="text-sm text-slate-500">クリックして画像を選択</p>
+          <p class="text-xs text-slate-300 mt-0.5">JPG・PNG対応</p>
+        </div>
+        <input type="file" id="ocr-input" accept="image/*" class="hidden" onchange="handleOcr(event)">
+
+        ${S.ocrProcessing ? `
+          <div class="mt-4 text-center">
+            <div class="inline-block w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-2"></div>
+            <p class="text-sm text-slate-500">読み取り中…</p>
+          </div>
+        ` : ''}
+
+        ${S.ocrText ? `
+          <div class="mt-4">
+            <p class="text-xs font-semibold text-slate-500 mb-1.5">読み取り結果</p>
+            <textarea id="ocr-edit" class="w-full border border-slate-200 rounded-xl p-3 text-sm text-slate-700 h-36 resize-none">${S.ocrText}</textarea>
+            <p class="text-xs text-slate-300 mt-1 mb-3">内容を確認・編集してから問題追加フォームで使用できます</p>
+            <button onclick="useOcr()"
+              class="w-full py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors">
+              このテキストを使って問題を追加
+            </button>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ---- ADD PROBLEM MODAL ----
+let _qCount = 1;
+
+function addModal() {
+  if (!S.showAdd) return '';
+  return `
+  <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="closeAdd()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-lg text-slate-800">＋ 問題を追加</h3>
+          <div class="flex items-center gap-2">
+            <button onclick="closeAdd();S.showOcr=true;render()"
+              class="text-xs px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors">
+              📷 OCRで読み取り
+            </button>
+            <button onclick="closeAdd()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">✕</button>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="text-xs font-semibold text-slate-400 block mb-1">級</label>
+              <select id="a-level" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white">
+                <option value="1">1級</option>
+                <option value="2" selected>2級</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-400 block mb-1">年度</label>
+              <input id="a-year" type="number" value="${new Date().getFullYear()}"
+                class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-400 block mb-1">回</label>
+              <select id="a-season" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white">
+                <option>第1回</option><option>第2回</option><option>第3回</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-1">パッセージタイトル</label>
+            <input id="a-title" type="text" placeholder="例: The Future of Renewable Energy"
+              class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm">
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-1">英文パッセージ</label>
+            <textarea id="a-passage" rows="8"
+              placeholder="パッセージのテキストを貼り付けてください..."
+              class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm resize-none">${S.addPrefill}</textarea>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-xs font-semibold text-slate-400">設問</label>
+              <button onclick="addQForm()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">＋ 設問を追加</button>
+            </div>
+            <div id="q-list">${qForm(0)}</div>
+          </div>
+
+          <div class="flex gap-3 pt-1">
+            <button onclick="closeAdd()"
+              class="flex-1 py-2.5 border-2 border-slate-200 text-slate-600 rounded-xl text-sm font-medium hover:bg-slate-50">
+              キャンセル
+            </button>
+            <button onclick="saveAdd()"
+              class="flex-1 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors">
+              保存する
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function qForm(i) {
+  return `
+  <div class="border border-slate-200 rounded-xl p-4 mb-3" id="qf-${i}">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm font-bold text-slate-700">Q${i+1}</span>
+      ${i>0?`<button onclick="document.getElementById('qf-${i}').remove()" class="text-xs text-red-400 hover:text-red-600">削除</button>`:''}
+    </div>
+    <textarea id="qt-${i}" rows="2" placeholder="問題文"
+      class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm mb-3 resize-none"></textarea>
+    ${[0,1,2,3].map(j=>`
+      <div class="flex items-center gap-2 mb-2">
+        <input type="radio" name="cor-${i}" value="${j}" id="r-${i}-${j}">
+        <label for="r-${i}-${j}" class="text-xs text-slate-400 w-6">(${j+1})</label>
+        <input id="qo-${i}-${j}" type="text" placeholder="選択肢 ${j+1}"
+          class="flex-1 border border-slate-200 rounded-lg px-2 py-1.5 text-sm">
+      </div>`).join('')}
+    <textarea id="qe-${i}" rows="2" placeholder="解説（任意）"
+      class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs mt-1 resize-none"></textarea>
+  </div>`;
+}
+
+function addQForm() {
+  const list = document.getElementById('q-list');
+  if (!list) return;
+  list.insertAdjacentHTML('beforeend', qForm(_qCount++));
+}
+
+// ---- MODAL CONTROLS ----
+function showAdd() { S.showAdd=true; S.addPrefill=''; _qCount=1; render(); }
+function closeAdd() { S.showAdd=false; render(); }
+function closeOcr() { S.showOcr=false; render(); }
+
+function handleOcr(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    S.ocrImage = e.target.result;
+    S.ocrProcessing = true;
+    S.ocrText = '';
+    render();
+    if (typeof Tesseract === 'undefined') {
+      // Tesseract not loaded — load it dynamically
+      const sc = document.createElement('script');
+      sc.src = 'https://unpkg.com/tesseract.js@4/dist/tesseract.min.js';
+      sc.onload  = () => runOcr(file);
+      sc.onerror = () => { S.ocrProcessing=false; S.ocrText='(Tesseract.js の読み込みに失敗しました。テキストを手動で入力してください)'; render(); };
+      document.head.appendChild(sc);
+    } else {
+      runOcr(file);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function runOcr(file) {
+  Tesseract.recognize(file, 'eng')
+    .then(({data:{text}}) => {
+      S.ocrProcessing = false;
+      S.ocrText = text.trim() || '(テキストを読み取れませんでした)';
+      render();
+    })
+    .catch(err => {
+      S.ocrProcessing = false;
+      S.ocrText = '(エラー: ' + err.message + ')';
+      render();
+    });
+}
+
+function useOcr() {
+  const el = document.getElementById('ocr-edit');
+  S.addPrefill = el ? el.value : S.ocrText;
+  S.showOcr = false;
+  S.showAdd = true;
+  _qCount = 1;
+  render();
+}
+
+// ---- SAVE NEW PROBLEM ----
+function saveAdd() {
+  const level   = parseInt(document.getElementById('a-level')?.value);
+  const year    = parseInt(document.getElementById('a-year')?.value);
+  const season  = document.getElementById('a-season')?.value;
+  const title   = document.getElementById('a-title')?.value?.trim();
+  const passage = document.getElementById('a-passage')?.value?.trim();
+
+  if (!title || !passage) { alert('タイトルとパッセージは必須です'); return; }
+
+  const questions = [];
+  let i = 0;
+  while (document.getElementById(`qf-${i}`)) {
+    const text = document.getElementById(`qt-${i}`)?.value?.trim();
+    if (text) {
+      const options = [0,1,2,3].map(j => document.getElementById(`qo-${i}-${j}`)?.value?.trim() || `選択肢 ${j+1}`);
+      let correctAnswer = 0;
+      for (let j=0;j<4;j++) { if (document.getElementById(`r-${i}-${j}`)?.checked) { correctAnswer=j; break; } }
+      const explanation = document.getElementById(`qe-${i}`)?.value?.trim() || '';
+      questions.push({id:i, text, options, correctAnswer, explanation});
+    }
+    i++;
+  }
+
+  if (questions.length === 0) { alert('設問を1つ以上入力してください'); return; }
+
+  U.custom.push({
+    id: 'c-' + Date.now(),
+    level, year, season,
+    number: '長文問題',
+    passageTitle: title,
+    passage, questions
+  });
+  saveU();
+  S.showAdd = false;
+  S.addPrefill = '';
+  render();
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+loadU();
+render();
+</script>
+</body>
+</html>
