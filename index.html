@@ -622,36 +622,26 @@ function bottomNav() {
   return `
   <nav class="bottom-nav fixed bottom-0 left-0 right-0 z-40 bg-white">
     <div class="max-w-5xl mx-auto">
-      <div class="flex items-end justify-around px-2 pb-safe">
+      <div class="flex items-center justify-around px-2">
 
-        ${items.slice(0,2).map(item => `
+        ${items.map(item => `
           <button onclick="go('${item.v}')"
-            class="nav-item ${S.view===item.v?'active text-indigo-600':'text-slate-400'} flex flex-col items-center gap-0.5 pt-3 pb-3 px-5 flex-1">
+            class="nav-item ${S.view===item.v?'active text-indigo-600':'text-slate-400'} flex flex-col items-center gap-0.5 py-3 px-4 flex-1">
             ${item.icon}
             <span class="text-[10px] font-semibold tracking-wide">${item.label}</span>
             ${S.view===item.v ? `<span class="w-1 h-1 rounded-full bg-indigo-500 mt-0.5"></span>` : `<span class="w-1 h-1 mt-0.5"></span>`}
           </button>
         `).join('')}
 
-        <!-- FAB: 問題追加 (center) -->
-        <div class="flex flex-col items-center pb-2 px-4 flex-shrink-0">
-          <button onclick="showAdd()"
-            class="fab w-14 h-14 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center -mt-5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-            </svg>
-          </button>
-          <span class="text-[10px] font-semibold text-slate-400 mt-1">問題追加</span>
-        </div>
-
-        ${items.slice(2).map(item => `
-          <button onclick="go('${item.v}')"
-            class="nav-item ${S.view===item.v?'active text-indigo-600':'text-slate-400'} flex flex-col items-center gap-0.5 pt-3 pb-3 px-5 flex-1">
-            ${item.icon}
-            <span class="text-[10px] font-semibold tracking-wide">${item.label}</span>
-            ${S.view===item.v ? `<span class="w-1 h-1 rounded-full bg-indigo-500 mt-0.5"></span>` : `<span class="w-1 h-1 mt-0.5"></span>`}
-          </button>
-        `).join('')}
+        <!-- 問題追加: 右端 -->
+        <button onclick="showAdd()"
+          class="nav-item flex flex-col items-center gap-0.5 py-3 px-4 flex-1 text-indigo-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span class="text-[10px] font-semibold tracking-wide">問題追加</span>
+          <span class="w-1 h-1 mt-0.5"></span>
+        </button>
 
       </div>
     </div>
