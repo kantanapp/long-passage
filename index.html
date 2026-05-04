@@ -26,9 +26,22 @@
     .fab { box-shadow: 0 4px 16px rgba(99,102,241,0.45); transition: all 0.15s; }
     .fab:active { transform: scale(0.93); }
     .fab:hover { box-shadow: 0 6px 20px rgba(99,102,241,0.55); }
+    /* ---- App Nav ---- */
+    .app-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; display: flex; align-items: center; height: 44px; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid #e2e8f0; padding: 0 8px; gap: 2px; }
+    .app-nav a { display: flex; align-items: center; gap: 3px; padding: 5px 9px; border-radius: 8px; text-decoration: none; color: #64748b; font-weight: 600; font-size: 13px; transition: background 0.15s, color 0.15s; white-space: nowrap; }
+    .app-nav a:hover { background: #f1f5f9; color: #1e293b; }
+    .app-nav-sep { color: #e2e8f0; font-size: 16px; margin: 0 2px; user-select: none; }
+    .app-nav-current { display: flex; align-items: center; gap: 3px; padding: 5px 9px; border-radius: 8px; color: #6366f1; background: #eef2ff; font-weight: 700; font-size: 13px; white-space: nowrap; }
   </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen" style="padding-top:44px">
+<nav class="app-nav">
+  <a href="https://41morinaga-glitch.github.io/eiken-portal/">🎓 TOP</a>
+  <span class="app-nav-sep">|</span>
+  <a href="https://eiken-vocab2026423.web.app">📚 単語</a>
+  <span class="app-nav-current">📝 長文</span>
+  <a href="https://41morinaga-glitch.github.io/eiken-app/">✍️ 要約</a>
+</nav>
 <div id="app"></div>
 
 <script>
