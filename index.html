@@ -26,23 +26,46 @@
     .fab { box-shadow: 0 4px 16px rgba(99,102,241,0.45); transition: all 0.15s; }
     .fab:active { transform: scale(0.93); }
     .fab:hover { box-shadow: 0 6px 20px rgba(99,102,241,0.55); }
-    /* ---- App Nav ---- */
-    .app-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; display: flex; align-items: center; height: 44px; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid #e2e8f0; padding: 0 8px; gap: 2px; }
-    .app-nav a { display: flex; align-items: center; gap: 3px; padding: 5px 9px; border-radius: 8px; text-decoration: none; color: #64748b; font-weight: 600; font-size: 13px; transition: background 0.15s, color 0.15s; white-space: nowrap; }
-    .app-nav a:hover { background: #f1f5f9; color: #1e293b; }
-    .app-nav-sep { color: #e2e8f0; font-size: 16px; margin: 0 2px; user-select: none; }
-    .app-nav-current { display: flex; align-items: center; gap: 3px; padding: 5px 9px; border-radius: 8px; color: #6366f1; background: #eef2ff; font-weight: 700; font-size: 13px; white-space: nowrap; }
+    /* ---- App Nav (hamburger) ---- */
+    .app-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; display: flex; align-items: center; height: 44px; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid #e2e8f0; padding: 0 8px; }
+    .app-nav-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: none; background: transparent; cursor: pointer; border-radius: 8px; color: #64748b; transition: background 0.15s; }
+    .app-nav-btn:hover { background: #f1f5f9; }
+    .app-menu-overlay { display: none; position: fixed; inset: 0; z-index: 9998; }
+    .app-menu { display: none; position: fixed; top: 44px; left: 8px; width: 180px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 9999; overflow: hidden; }
+    .app-menu a, .app-menu-current { display: flex; align-items: center; padding: 12px 16px; font-size: 14px; text-decoration: none; color: #1e293b; transition: background 0.15s; }
+    .app-menu a:hover { background: #f1f5f9; }
+    .app-menu-current { font-weight: 700; color: #6366f1; background: #eef2ff; cursor: default; }
+    .app-nav-open .app-menu, .app-nav-open .app-menu-overlay { display: block; }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen" style="padding-top:44px">
-<nav class="app-nav">
+<nav id="appNav" class="app-nav">
+  <button class="app-nav-btn" onclick="toggleAppMenu()" title="メニュー" id="appNavBtn">
+    <svg id="iconMenu" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    <svg id="iconClose" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+  </button>
+</nav>
+<div class="app-menu-overlay" onclick="closeAppMenu()"></div>
+<div class="app-menu" id="appMenu">
   <a href="https://kantanapp.github.io/eiken-portal/">🎓 TOP</a>
-  <span class="app-nav-sep">|</span>
   <a href="https://eiken-vocab2026423.web.app">📚 単語</a>
-  <span class="app-nav-current">📝 long-passage</span>
+  <div class="app-menu-current">📝 長文</div>
   <a href="https://kantanapp.github.io/summary/">✍️ 要約</a>
   <a href="https://kantanapp.github.io/summary/vocab-quiz/">🔤 単語クイズ</a>
-</nav>
+</div>
+<script>
+  function toggleAppMenu() {
+    var nav = document.getElementById('appNav');
+    var open = nav.classList.toggle('app-nav-open');
+    document.getElementById('iconMenu').style.display = open ? 'none' : '';
+    document.getElementById('iconClose').style.display = open ? '' : 'none';
+  }
+  function closeAppMenu() {
+    document.getElementById('appNav').classList.remove('app-nav-open');
+    document.getElementById('iconMenu').style.display = '';
+    document.getElementById('iconClose').style.display = 'none';
+  }
+</script>
 <div id="app"></div>
 
 <script>
