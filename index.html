@@ -35,7 +35,6 @@
     .app-menu a, .app-menu-current { display: flex; align-items: center; padding: 12px 16px; font-size: 14px; text-decoration: none; color: #1e293b; transition: background 0.15s; }
     .app-menu a:hover { background: #f1f5f9; }
     .app-menu-current { font-weight: 700; color: #6366f1; background: #eef2ff; cursor: default; }
-    .app-nav-open .app-menu, .app-nav-open .app-menu-overlay { display: block; }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen" style="padding-top:44px">
@@ -55,13 +54,17 @@
 </div>
 <script>
   function toggleAppMenu() {
-    var nav = document.getElementById('appNav');
-    var open = nav.classList.toggle('app-nav-open');
+    var menu = document.getElementById('appMenu');
+    var overlay = document.querySelector('.app-menu-overlay');
+    var open = menu.style.display !== 'block';
+    menu.style.display = open ? 'block' : 'none';
+    overlay.style.display = open ? 'block' : 'none';
     document.getElementById('iconMenu').style.display = open ? 'none' : '';
     document.getElementById('iconClose').style.display = open ? '' : 'none';
   }
   function closeAppMenu() {
-    document.getElementById('appNav').classList.remove('app-nav-open');
+    document.getElementById('appMenu').style.display = 'none';
+    document.querySelector('.app-menu-overlay').style.display = 'none';
     document.getElementById('iconMenu').style.display = '';
     document.getElementById('iconClose').style.display = 'none';
   }
